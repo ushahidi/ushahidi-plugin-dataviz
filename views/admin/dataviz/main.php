@@ -1,27 +1,55 @@
-<?php 
+<?php
 /**
  * Data visualisations view page.
  *
  * PHP version 5
- * LICENSE: This source file is subject to LGPL license 
+ * LICENSE: This source file is subject to LGPL license
  * that is available through the world-wide-web at the following URI:
  * http://www.gnu.org/copyleft/lesser.html
- * @author     Ushahidi Team <team@ushahidi.com> 
+ * @author     Ushahidi Team <team@ushahidi.com>
  * @package    Ushahidi - http://source.ushahididev.com
  * @module     API Controller
  * @copyright  Ushahidi - http://www.ushahidi.com
- * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
+ * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 ?>
 <h2>
 <?php admin::manage_subtabs("Data Visualization"); ?>
 </h2>
 
+<script type="text/javascript" src="../media/js/saveSvgAsPng.js"></script>
 <div class="content-wrap clearfix">
     <div>
 		<?php echo form::open('admin/dataviz', array('method' => 'get', 'style' => "display: inline;")); ?>
-			<p><b>Step 1:</b> Pick a variable: 
-			<select name='category'>
+
+			<div style="height:30px;margin-top:25px;">
+				<span style="display:inline-block;width:80px;">Region:</span>
+				<select name='region'>
+				<?php
+					if ($region == 0) {
+						echo '<option value=0 selected>All Regions</option>';
+					} else {
+						echo '<option value=0>All Regions</option>';
+					}
+				?>
+
+				<?php
+					foreach ($region_array as $region_id => $region_title) {
+						echo '<option value='.$region_id;
+						if ($region == $region_id) {
+							echo ' selected>';
+						} else {
+							echo ' >';
+						}
+						echo $region_title.'</option>';
+					}
+				?>
+				</select>
+			</div>
+
+			<div style="height:30px;">
+				<span style="display:inline-block;width:80px;">Variable:</span>
+				<select name='category'>
 				<?php if ($category == 0)
 				{
 					print('<option value=0 selected>All Categories</option>');
@@ -31,8 +59,8 @@
 					print('<option value=0>All Categories</option>');
 				}
 				?>
-						
-				<?php foreach ($category_array as $category_id => $category_title)
+
+				<?php foreach ($axis_array as $category_id => $category_title)
 				{
 					print('<option value='.$category_id);
 					if ($category == $category_id)
@@ -46,84 +74,82 @@
 					print($category_title.'</option>');
 				}
 				?>
-			</select>
+				</select>
+			</div>
 
-			<P><b>Step 2:</b> <?php echo Kohana::lang('stats.choose_date_range');?>: 
-				<input type="text" class="dp" name="dp1" id="dp1" value="<?php echo $dp1; ?>" />&nbsp;&nbsp;-&nbsp;&nbsp; 
-				<input type="text" name="tp1" id="tp1" value="<?php echo $tp1; ?>" />
-				<input type="text" class="dp" name="dp2" id="dp2" value="<?php echo $dp2; ?>" /> 
-				<input type="text" name="tp2" id="tp2" value="<?php echo $tp2; ?>" />
+			<div style="height:30px;">
+				<span style="display:inline-block;width:80px;">Date Range:</span>
+				<input type="text" class="dp" name="dp1" id="dp1" value="<?php echo $dp1; ?>" />
+				<input type="text" name="tp1" id="tp1" value="<?php echo $tp1; ?>" style="width:50px;" />
+				&nbsp;&nbsp; to <input type="text" class="dp" name="dp2" id="dp2" value="<?php echo $dp2; ?>" />
+				<input type="text" name="tp2" id="tp2" value="<?php echo $tp2; ?>" style="width:50px;" />
 				<!-- <p>or click for last <a href="<?php print url::site() ?>admin/stats/reports/?range=30"><?php echo Kohana::lang('stats.time_range_1');?></a> <a href="<?php print url::site() ?>admin/stats/reports/?range=90"><?php echo Kohana::lang('stats.time_range_2');?></a> <a href="<?php print url::site() ?>admin/stats/reports/?range=180"><?php echo Kohana::lang('stats.time_range_3');?></a> <a href="<?php print url::site() ?>admin/stats/reports/"><?php echo Kohana::lang('stats.time_range_all');?></a> -->
 				<input type="hidden" name="range" value="<?php echo $range; ?>" />
 
-			<p><b>Step 3:</b> Choose a visualisation type
-			<select name='viztype'>
-				<?php foreach ($viztypes as $v)
-				{
-					print('<option value='.$v);
-					if ($viztype == $v)
-					{
-						print(' selected>');
-					}
-					else
-					{
-						print(' >');
-					}
-					print($v.'</option>');
-				}
-				?>
-			</select>
+				<script type="text/javascript">
+					$(document).ready(function() {
 
-			<p><b>Step 4:</b> <input type="submit" value="Go &rarr;" class="button" />
+						// Uncomment datepicker options to use a little calendar icon next to the form fields
+
+						$("#dp1").datepicker({
+							/*showOn: "both",
+							buttonImage: "<?php echo url::base(); ?>media/img/icon-calendar.gif",
+							buttonImageOnly: true*/
+							dateFormat: "yy-mm-dd"
+						});
+
+						$("#dp2").datepicker({
+							/*showOn: "both",
+							buttonImage: "<?php echo url::base(); ?>media/img/icon-calendar.gif",
+							buttonImageOnly: true*/
+						});
+					});
+				</script>
+			</div>
+
+			<div style="height:30px;">
+				<span style="display:inline-block;width:80px;">Type:</span>
+				<select name='viztype'>
+					<?php foreach ($viztypes as $v)
+					{
+						print('<option value='.$v);
+						if ($viztype == $v)
+						{
+							print(' selected>');
+						}
+						else
+						{
+							print(' >');
+						}
+						print($v.'</option>');
+					}
+					?>
+				</select>
+			</div>
+
+			<div style="height:30px;">
+				<input type="submit" value="Go &rarr;" class="button" />
+			</div>
+
 			<?php echo form::close(); ?>
-			</p>
+
 	</div>
-	
+
 	<!-- Left Column: Visualisation -->
-	<div class="chart-holder" id="chart-holder" style="height:350px;text-align:center;">
-		<?php echo $reports_chart; ?>
-	</div>
-	<p></p>
+	<?php echo $reports_chart; ?>
+
+	<?php /* This paragraph tag maintains height since the chart is positioned absolutely and will overlap the dataset otherwise */ ?>
+	<p style="height:<?php echo $chartheight; ?>px;"></p>
 	<div style="clear:both;"></div>
 
 
 <!-- Export visualisation button: easy version -->
-<!--    <div>
+    <div>
     	<p>
-	    	<a href="javascript:print_svg('svg')" class="print"><?php echo Kohana::lang('ui_dataviz.print_as_svg');?></a>
-			
-			<?php echo form::open('admin/dataviz', array('method' => 'get', 'id' => 'printsimple')); ?>
-				<input type="hidden" name="action" value="print" />
-			 	<input type="hidden" name="print_format" id="print_format" value="">
-	 			<input type="hidden" name="print_data" id="print_data" value="">
-			<?php echo form::close(); ?>
+	    	<a href="javascript:saveSvgAsPng(document.getElementById('chart-holder').lastChild, 'diagram.png');"><?php echo Kohana::lang('ui_dataviz.download_SVG');?></a>
 		</p>
 	</div>
 	<div style="clear:both;"></div>
--->
- 
-<!-- Buttons to export visualisation to file -->
-<!-- <?php echo form::open('admin/dataviz', array('method' => 'post', 'id' => 'printform', 'style' => "display: inline;")); ?>
-	<input type="hidden" name="action" value="print" />
- 	<input type="hidden" id="output_format" name="output_format" value="">
- 	<input type="hidden" id="data" name="data" value="">
-<?php echo form::close(); ?> -->
-
-<!-- <form id="printform" method="post" action="download.pl"> 
-	<input type="hidden" name="action" value="print" />
- 	<input type="hidden" id="output_format" name="output_format" value="">
- 	<input type="hidden" id="data" name="data" value="">
-</form> -->
-
-<!-- <div class="export">
-	<br/>
-	<button class="btn btn-success" id="save_as_svg" value="">
-		Save as SVG</button>
-	<button class="btn btn-success" id="save_as_pdf" value="">
-		Save as PDF</button>
-	<button class="btn btn-success" id="save_as_png" value="">
-		Save as High-Res PNG</button>
-</div> -->
 
 
 	<!-- Left Column: Data table -->

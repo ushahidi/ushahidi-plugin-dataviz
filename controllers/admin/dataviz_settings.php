@@ -46,20 +46,21 @@ class DataViz_Settings_Controller extends Admin_Controller
 		{			
 			// Fetch the new input data and old stored data for this gisfile id (if it's input)
 			$post_data = array_merge($_POST, $_FILES);
-			echo(json_encode($post_data));
+			// echo(json_encode($post_data));
 			$gisfile = (isset($post_data['gisfile_id']) AND Gisfile_Model::is_valid_gisfile($post_data['gisfile_id']))
-						? new Layer_Model($post_data['gisfile_id'])
-						: new Layer_Model();
+						? new Gisfile_Model($post_data['gisfile_id'])
+						: new Gisfile_Model();
 
 			// Add / Edit data
 			if ($post_data['action'] == 'a')
 			{
 
 				// Extract input data
-				$gisfile_data = arr::extract($post_data, 'gisfile_description', 'gisfile_formfields', 
-					'gisfile_file_old');
+				//FIXIT: give user a list of existing formfields to pick form; process list here
+				$gisfile->gisfile_description = $post_data['gisfile_description'];
+				$gisfile->gisfile_formfields  = $post_data['gisfile_formfields'];
+				$gisfile_data = arr::extract($post_data, 'gisfile_description', 'gisfile_formfields', 'gisfile_file_old');
 				$gisfile_data['gisfile_file'] = isset($post_data['gisfile_file']['name'])? $post_data['gisfile_file']['name'] : NULL;
-				$gisfile_formfields = $_POST['gisfile_formfields']; //FIXIT: give user a list of existing formfields to pick form; process list here
 
 				// Extract file data for upload validation
 				$file_data = arr::extract($post_data, 'gisfile_file');
@@ -70,10 +71,11 @@ class DataViz_Settings_Controller extends Admin_Controller
 						->add_rules('gisfile_file', 'upload::valid','upload::type[json,geojson]');
 				
 				// Test to see if validation has passed
-				if ($gisfile->validate($gisfile_data) AND $post->validate(FALSE))
+				//FIXIT: get validate working 
+				//if ($gisfile->validate($gisfile_data) AND $post->validate(FALSE))
+				if ($post->validate(FALSE))
 				{
 					// Success! SAVE
-					echo("saving");
 					$gisfile->save();
 					
 					$path_info = upload::save("gisfile_file");
@@ -86,7 +88,12 @@ class DataViz_Settings_Controller extends Admin_Controller
 
 						// Resave gisfile with new filename and options list
 						$gisfile->gisfile_filename = $gisfile_filename;
-                		$gisfile->gisfile_options = geojson::get_geometries($gisfile_filename);
+						$geojson = new geojson;
+ 	                   	$geometry = $geojson->get_geometry($gisfile_filename);
+                    	$gisfile->gisfile_options = $geometry['options'];
+                    	$gisfile->gisfile_xpos    = $geometry['xpos'];
+                    	$gisfile->gisfile_ypos    = $geometry['ypos'];
+                    	$gisfile->gisfile_width   = $geometry['width'];
 						$gisfile->save();
 					}
 					
@@ -112,6 +119,7 @@ class DataViz_Settings_Controller extends Admin_Controller
 				// Delete action
 				if ($gisfile->loaded)
 				{
+					echo "deleting gisfile";
 					// Delete geotiff file if any
 					$gisfile_file = $gisfile->gisfile_filename;
 					if ( ! empty($gisfile_file) AND file_exists(Kohana::config('upload.directory', TRUE).$gisfile_file))

@@ -53,8 +53,13 @@ class Gisfile_Model extends ORM_Tree
 		
 		$table_prefix = Kohana::config('database.default.table_prefix');
 		
-		$this->db->query('UPDATE `'.$table_prefix.'gisfile` SET gisfile_description = ?, gisfile_filename = ?, gisfile_options = ?, gisfile_formfields = ? WHERE id = ? AND locale = ?',
-			$this->gisfile_description, $this->gisfile_filename, $this->gisfile_options, $this->gisfile_formfields, $this->id, $this->locale
+		$this->db->query('UPDATE `'.$table_prefix.'gisfile` SET gisfile_description = ?, '.
+			'gisfile_filename = ?, gisfile_options = ?, gisfile_formfields = ?, '.
+			'gisfile_xpos = ?, gisfile_ypos = ?, gisfile_width = ? '.
+			'WHERE id = ? AND locale = ?',
+			$this->gisfile_description, $this->gisfile_filename, $this->gisfile_options, 
+			$this->gisfile_formfields, $this->gisfile_xpos, $this->gisfile_ypos, 
+			$this->gisfile_width, $this->id, $this->locale
 		);
 	}
 	
@@ -80,6 +85,9 @@ class Gisfile_Model extends ORM_Tree
 				self::$gisfiles[$gisfile->id]['gisfile_formfields'] = $gisfile->gisfile_formfields;
 				self::$gisfiles[$gisfile->id]['gisfile_filename'] = $gisfile->gisfile_filename;
 				self::$gisfiles[$gisfile->id]['gisfile_options'] = $gisfile->gisfile_options;
+				self::$gisfiles[$gisfile->id]['gisfile_xpos'] = $gisfile->gisfile_xpos;
+				self::$gisfiles[$gisfile->id]['gisfile_ypos'] = $gisfile->gisfile_ypos;
+				self::$gisfiles[$gisfile->id]['gisfile_width'] = $gisfile->gisfile_width;
 			}
 		}
 		

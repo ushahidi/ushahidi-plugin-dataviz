@@ -14,7 +14,10 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 ?>
-
+</form> <?php /* TODO: Have a better way of handling this nested form issue. plugin_settings.php
+						opens a form already, but that's not very smart since the settings page
+						will likely want to handle forms in it's own way. THERE IS ANOTHER OPENING
+						FORM TAG AT THE BOTTOM OF THIS PAGE */ ?>
 <div class="bg">
 	<?php
 	if ($form_error) 
@@ -46,48 +49,9 @@
 	}
 	?>
 				
-	<!-- tabs: the little areas that pop up when you click on e.g. 'edit' -->
-	<div class="tabs">
-		<!-- tabset -->
-		<a name="add"></a>
-		<ul class="tabset">
-			<li><a href="#" class="active"><?php echo Kohana::lang('ui_main.add_edit');?></a></li>
-		</ul>
-		
-		<!-- add/edit gis file tab -->
-		<div class="tab">
-			
-			<?php print form::open(NULL,array('enctype' => 'multipart/form-data', 
-				'id' => 'gisfileMain', 'name' => 'gisfileMain')); ?>
-			<input type="hidden" id="gisfile_id" name="gisfile_id" value="" />
-			<input type="hidden" name="action" id="action" value="a"/>
-			<input type="hidden" name="gisfile_file_old" id="gisfile_file_old" value=""/>
-			<div class="tab_form_item">
-				<strong><?php echo Kohana::lang('ui_main.description');?>:</strong><br />
-				<?php print form::input('gisfile_description', $form['gisfile_description'], ' class="text gisfile_description"'); ?>
-			</div>
-			<div class="tab_form_item">
-				<strong><?php echo Kohana::lang('ui_dataviz.linked_to_formfields');?>:</strong><br />
-				<?php print form::input('gisfile_formfields', $form['gisfile_formfields'], ' class="text gisfile_formfields"'); ?><br/>
-			</div>
-
-			<div class="tab_form_item">
-				<strong><?php echo Kohana::lang('ui_dataviz.upload_geojson_file');?>:</strong><br />
-				<?php print form::upload('gisfile_file', '', ''); ?>
-			</div>
-
-			<div style="clear:both"></div>
-			<div class="tab_form_item">
-				<input type="submit" class="save-rep-btn" value="<?php echo Kohana::lang('ui_main.save');?>" />
-			</div>
-			<?php print form::close(); ?>			
-		</div>
-
-	</div>
-
 	<!-- report-table -->
 	<div class="report-form">
-		<?php print form::open(NULL,array('id' => 'gisfileListing', 'name' => 'gisfileListing')); ?>
+		<?php print form::open(NULL,array('enctype' => 'multipart/form-data', 'id' => 'gisfileListing', 'name' => 'gisfileListing')); ?>
 		<input type="hidden" name="action" id="action" value="">
 		<input type="hidden" name="gisfile_id" id="gisfile_id_action" value="">
 		<div class="table-holder">
@@ -116,6 +80,9 @@
 					$gisfile_formfields  = $gisfile->gisfile_formfields;
 					$gisfile_file        = $gisfile->gisfile_filename;
 					$gisfile_options     = $gisfile->gisfile_options;
+					$gisfile_xpos        = $gisfile->gisfile_xpos;
+					$gisfile_ypos        = $gisfile->gisfile_ypos;
+					$gisfile_width       = $gisfile->gisfile_width;
 					?>
 					<tr id="<?php echo $gisfile_id; ?>">
 						<td class="col-3">
@@ -124,11 +91,13 @@
 						<td class="col-2">
 							<div class="post">
 								<h4><?php echo html::escape($gisfile_description); ?></h4>
-								(Options: "<?php echo $gisfile_options; ?>")
+								Options: "<?php echo $gisfile_options; ?>"
+								<br>Centre lat/long: [<?php echo $gisfile_xpos; ?>,<?php echo $gisfile_ypos; ?>]
+								<br>Size (degrees): <?php echo $gisfile_width; ?>
 							</div>
 						</td>
 						<td class="col-1">
-							<p><?php echo " "; ?></p>
+							<p><?php echo html::escape($gisfile_formfields); ?></p>
 						</td>
 						<td class="col-4">
 							<ul>
@@ -145,4 +114,44 @@
 		<?php print form::close(); ?>
 	</div>
 
+	<!-- tabs: the little areas that pop up when you click on e.g. 'edit' -->
+	<div class="tabs">
+		<!-- tabset -->
+		<a name="add"></a>
+		<ul class="tabset">
+			<li><a href="#" class="active"><?php echo Kohana::lang('ui_main.add_edit');?></a></li>
+		</ul>
+		
+		<!-- add/edit gis file tab -->
+		<div class="tab">
+			<?php print form::open(NULL,array('enctype' => 'multipart/form-data', 
+				'id' => 'gisfileMain', 'name' => 'gisfileMain')); ?>
+			<input type="hidden" id="gisfile_id" name="gisfile_id" value="" />
+			<input type="hidden" name="action" id="action" value="a"/>
+			<input type="hidden" name="gisfile_file_old" id="gisfile_file_old" value=""/>
+			<div class="tab_form_item">
+				<strong><?php echo Kohana::lang('ui_main.description');?>:</strong><br />
+				<?php print form::input('gisfile_description', $form['gisfile_description'], ' class="text gisfile_description"'); ?>
+			</div>
+			<div class="tab_form_item">
+				<strong><?php echo Kohana::lang('ui_dataviz.linked_to_formfields');?>:</strong><br />
+				<?php print form::input('gisfile_formfields', $form['gisfile_formfields'], ' class="text gisfile_formfields"'); ?><br/>
+			</div>
+
+			<div class="tab_form_item">
+				<strong><?php echo Kohana::lang('ui_dataviz.upload_geojson_file');?>:</strong><br />
+				<?php print form::upload('gisfile_file', '', ''); ?>
+			</div>
+
+			<div style="clear:both"></div>
+			<div class="tab_form_item">
+				<input type="submit" class="save-rep-btn" value="<?php echo Kohana::lang('ui_main.save');?>" />
+			</div>
+			<?php print form::close(); ?>			
+		</div>
+
+	</div>
+
 </div>
+
+<form> <?php /* See TODO at the top of the page */ ?>

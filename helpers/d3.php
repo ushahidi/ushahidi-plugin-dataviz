@@ -1,14 +1,14 @@
 <?php
 
 class d3 {
-	
+
 	function d3() {
-	
+
 	}
 
 	/*
 	 * The chart function creates a chart
-	 * 
+	 *
 	 * name: The name of the div element for the chart. Should be unique from all other charts
 	 * data: Multi-dimensional array. Ex: array('label1'=>array(1,2,3,4,5),'label2'=>array(3,2,4,2))
 	 * options: Multi-dimensional array. Ex: array('bars'=>array('show'=>'true'))
@@ -20,9 +20,6 @@ class d3 {
 	 *
 	 */
   public function linechart($name='chart',$data,$options_array=null,$custom_color=null,$width=400,$height=300) {
-    
-    //var_dump($data);
-    //asort($data);
 
     $datarows = [];
     foreach($data as $row){
@@ -32,7 +29,7 @@ class d3 {
 
     $html = '<style>
 
-      .axis path, 
+      .axis path,
       .axis line {
         fill: none;
         stroke: black;
@@ -52,7 +49,7 @@ class d3 {
 
       .line:hover {
         stroke: brown;
-      }   
+      }
 
       .horizontalGrid {
         fill: none;
@@ -61,6 +58,10 @@ class d3 {
         stroke-width: 1px;
       }
     </style>
+
+    <div class="chart-holder" id="chart-holder" style="background-color:#fff;position:absolute;height:'.$height.'px;width:'.$width.'px;text-align:center;">
+    </div>
+
     <script type="text/javascript" src="../media/js/d3.js"></script>
     <script type="text/javascript">
      var margin = {top: 20, right: 20, bottom: 120, left: 40};
@@ -69,7 +70,7 @@ class d3 {
 
      var dataset = '.$datahtml.';
      //var dataset = [["2015-02-20",10], ["2015-02-21", 20], ["2015-02-22", 15]];
- 
+
      var svg = d3.select(".chart-holder")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -87,7 +88,7 @@ class d3 {
         .rangeRoundBands([0, width]);
 
       var yScale = d3.scale.linear()
-        .domain([0, d3.max(dataset, function(d) { 
+        .domain([0, d3.max(dataset, function(d) {
           return d[1];
         })])
         .rangeRound([height, 0]);
@@ -106,12 +107,12 @@ class d3 {
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis)
-        .selectAll("text")  
+        .selectAll("text")
             .style("text-anchor", "end")
             .attr("dx", "-.8em")
             .attr("dy", ".15em")
             .attr("transform", function(d) {
-                return "rotate(-65)" 
+                return "rotate(-65)"
                 });
 
       svg.append("g")
@@ -135,12 +136,12 @@ class d3 {
         .attr("stroke", "steelblue")
           .attr("class", "line");
 
-      svg.selectAll("dot")                                    
-        .data(dataset)                                            
-        .enter().append("circle")                                
+      svg.selectAll("dot")
+        .data(dataset)
+        .enter().append("circle")
         .attr("fill", "steelblue")
-        .attr("r", 5)    
-        .attr("cx", function(d) { return xScale(d[0]) + xScale.rangeBand()/2; })         
+        .attr("r", 5)
+        .attr("cx", function(d) { return xScale(d[0]) + xScale.rangeBand()/2; })
         .attr("cy", function(d) { return yScale(d[1]); })
 
       svg.selectAll("line.horizontalGrid")
@@ -157,20 +158,22 @@ class d3 {
 
     </script>';
 
-     return $html; 
+     return $html;
   }
 
 
 	public function barchart($name='chart',$data,$options_array=null,$custom_color=null,$width=400,$height=300) {
-		
-		//var_dump($data);
-    //asort($data);
 
     // Switches
     $responsive_axis = "true"; //x axis goes from 0 to 100 if false; 0 to max($data) if true
-    $barsize = 0.5; //Size of bars relative to width available, e.g. "0.5" = bars are half-sized.
-    $barsize = min($barsize, 1);
     $axistext = "%";
+
+    $barsize_pixels = 25;
+    $barsize_pixels_active = true; // false if barsize should be evaluated as percentage (0-1), true if real pixel size (X pixel width)
+    $barsize = 0.5;
+    if($barsize_pixels == false) {
+      $barsize = min($barsize, 1);
+    }
 
 		$datarows = [];
 		foreach($data as $row){
@@ -179,7 +182,8 @@ class d3 {
 		$datahtml = "[".implode(",", $datarows)."]";
 
 		$html = '<style>
-      		.axis path, 
+
+      		.axis path,
       		.axis line {
         		fill: none;
         		stroke: black;
@@ -198,12 +202,15 @@ class d3 {
         .bartext {
           font-family: sans-serif;
           font-size: 11px;
-          fill: white;          
+          fill: white;
         }
 		    .bar:hover {
         		fill: brown;
       		}
 		    </style>
+
+        <div class="chart-holder" id="chart-holder" style="background-color:#fff;position:absolute;height:'.$height.'px;width:'.$width.'px;text-align:center;">
+        </div>
   			<script type="text/javascript" src="../media/js/d3.js"></script>
 			  <script type="text/javascript">
 
@@ -215,7 +222,7 @@ class d3 {
          //    dataset = dataset.sort(function(a,b) {
          //      return a[1] > b[1];
          //    });
- 
+
 	      		var svg = d3.select(".chart-holder")
         			.append("svg")
     			    .attr("width", width + margin.left + margin.right)
@@ -226,7 +233,7 @@ class d3 {
           if ('.$responsive_axis.' == true)
           {
       			var xScale = d3.scale.linear()
-          			.domain([0, d3.max(dataset, function(d) { 
+          			.domain([0, d3.max(dataset, function(d) {
             				return d[1];
           			})])
           			.range([0, width]);
@@ -248,8 +255,8 @@ class d3 {
         			.scale(xScale)
         			.orient("bottom")
         			.ticks(10)
-              .tickFormat(function(d) { 
-                return d + "'.$axistext.'"; 
+              .tickFormat(function(d) {
+                return d + "'.$axistext.'";
               });
 
 		      	var yAxis = d3.svg.axis()
@@ -273,7 +280,7 @@ class d3 {
         			.append("rect")
         			.attr("class", "bar")
         			.attr("x", 0)
-        			.attr("width", function(d) { 
+        			.attr("width", function(d) {
           				return xScale(d[1]);
         			})
         			.attr("y", function(d) {
@@ -283,7 +290,9 @@ class d3 {
         			//.attr("fill", function(d, i) {
           		//		return "rgb(0,0, " + (i*100) + ")";
         			//})
-        			.attr("height", yScale.rangeBand()*'.$barsize.');
+        			.attr("height", function(d) {
+                return '.($barsize_pixels_active ? $barsize_pixels : 'yScale.rangeBand()*'.$barsize).'
+              });
 
             svg.selectAll("bartext")
               .data(dataset)
@@ -307,15 +316,22 @@ class d3 {
 
 
 public function colchart($name='chart',$data,$options_array=null,$custom_color=null,$width=400,$height=300) {
-    
-    //var_dump($data);
-    //arsort($data);
+
+    // Sort high to low based on counts.
+    usort($data, function($x,$y){
+      return $y[1] - $x[1];
+    });
 
     // Switches
     $responsive_axis = "true"; //y axis goes from 0 to 100 if false; 0 to max($data) if true
-    $barsize = 0.5; //Size of bars relative to width available, e.g. "0.5" = bars are half-sized.
-    $barsize = min($barsize, 1);
     $axistext = "%";
+
+    $barsize_pixels = 50;
+    $barsize_pixels_active = true; // false if barsize should be evaluated as percentage (0-1), true if real pixel size (X pixel width)
+    $barsize = 0.5; // .5 for half sized, 1 for full sized, etc
+    if($barsize_pixels == false) {
+      $barsize = min($barsize, 1);
+    }
 
     $datarows = [];
     foreach($data as $row){
@@ -324,7 +340,7 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
     $datahtml = "[".implode(",", $datarows)."];";
 
     $html = '<style>
-          .axis path, 
+          .axis path,
           .axis line {
             fill: none;
             stroke: black;
@@ -347,9 +363,14 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
         .bartext {
           font-family: sans-serif;
           font-size: 11px;
-          fill: white;          
+          fill: white;
         }
         </style>
+
+
+        <div class="chart-holder" id="chart-holder" style="background-color:#fff;position:absolute;height:'.$height.'px;width:'.$width.'px;text-align:center;">
+        </div>
+
         <script type="text/javascript" src="../media/js/d3.js"></script>
         <script type="text/javascript">
 
@@ -358,7 +379,7 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
           var height = '.$height.' - margin.top - margin.bottom;
 
             var dataset = '.$datahtml.';
- 
+
             var xScale = d3.scale.ordinal()
               .domain(dataset.map(function(d) {
                   return d[0];
@@ -368,7 +389,7 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
           if ('.$responsive_axis.' == true)
           {
               var yScale = d3.scale.linear()
-              .domain([0, d3.max(dataset, function(d) { 
+              .domain([0, d3.max(dataset, function(d) {
                   return d[1];
               })])
               .range([height,0]);
@@ -377,7 +398,7 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
           {
               var yScale = d3.scale.linear()
               .domain([0, 1])
-              .range([height,0]);            
+              .range([height,0]);
           }
 
             var xAxis = d3.svg.axis()
@@ -389,8 +410,8 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
               //.attr("transform", "translate(80,0)")
               .orient("left")
               .ticks(10)
-              .tickFormat(function(d) { 
-                return d + "'.$axistext.'"; 
+              .tickFormat(function(d) {
+                return d + "'.$axistext.'";
               });
 
             var svg = d3.select(".chart-holder")
@@ -416,10 +437,13 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
               .enter()
               .append("rect")
               .attr("class", "bar")
-              .attr("x", function(d) { 
+              .attr("x", function(d) {
                    return xScale(d[0]) + xScale.rangeBand()*(1-'. $barsize.')/2;
               })
-              .attr("width", xScale.rangeBand()*'.$barsize.')
+              .attr("width", function() {
+                return '.($barsize_pixels_active ? $barsize_pixels : 'xScale.rangeBand()*'.$barsize).'
+                //return xScale.rangeBand()*'.$barsize.'
+              })
               .attr("y", function(d) {
                   return yScale(d[1]);
               })
@@ -474,15 +498,14 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
   }
 
 
-  public function choropleth($name='chart',$data,$options_array=null,$custom_color=null,$width=400,$height=300) {
-    
-    // var_dump($data);
-    
-    //Input variables per country
-    $countrycode = "yem";
-    $uploadfile = url::base() .'media/d3maps/'.$countrycode."_admin1.json";
-    $countrycenter = [48, 15.333];
-    $countrysize = 2500;//4000;
+  public function choropleth($name='chart',$data, $basemap, $options_array=null,$custom_color=null,$width=400,$height=300) {
+
+    //Get details about choropleth basemap
+    $mapfile   = $basemap['file'];
+    $mapcenter = $basemap['center'];
+    $mapsize   = 360*2*$basemap['size']/$width;
+
+    //Example dataset for Yemen admin1 map
     // $data = [["Sa`dah",0],["Al Hudaydah",.10],["Al Mahwit",.15],["Dhamar",.07],
     // ["Hajjah",.20],["Amran",.17],["Ibb",.25],["Lahij",.15],["Ta`izz",.04],["Al Mahrah",.15],
     // ["Al Bayda'",.17],["Al Dali'",.05],["Al Jawf",.15],["Shabwah",.21],["Ma'rib",.06],
@@ -533,6 +556,10 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
           font-size: 12px;
         }
       </style>
+
+      <div class='chart-holder' id='chart-holder' style='background-color:#fff;position:absolute;height:".$height."px;width:".$width."px;text-align:center;'>
+      </div>
+
       <script type='text/javascript' src='../media/js/d3.js'></script>
       <script src='../media/js/topojson.v1.min.js'></script>
       <script src='../media/js/d3-tip.js'></script>
@@ -541,17 +568,37 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
         var width = ".$width.";
         var height = ".$height.";
 
-        //Set mapping from values to colours
-        var quantize = d3.scale.quantize()
-            .domain([0, ".$maxcolour."])
-            .range(d3.range(9).map(function(i) { return 'q' + i + '-9'; }));
-
         //Get dataset into a form D3 can read
         dataset_in = ".$datahtml.";
         var dataset = d3.map();
-        for (var i in dataset_in) { 
-          dataset.set(dataset_in[i][0], dataset_in[i][1]); 
+        if (dataset_in.length > 0) {
+          var maxval = dataset_in[0][1];
         }
+        else {
+          var maxval = 9;
+        }
+        for (var i in dataset_in) {
+          dataset.set(dataset_in[i][0], dataset_in[i][1]);
+          if (dataset_in[i][1] > maxval) {
+            maxval = dataset_in[i][1];
+          }
+        }
+
+        //Set mapping from values to colours
+        if (maxval <= 1) {
+          rangetop = maxval;
+        }
+        else if (maxval <= 9) {
+          rangetop = 9;
+        }
+        else {
+          rangetop = 9*Math.round(maxval/9);
+        }
+        var calcstep = Math.round(maxval/9); //will be 0 if maxval < 1
+
+        var quantize = d3.scale.quantize()
+            .domain([0, rangetop])
+            .range(d3.range(9).map(function(i) { return 'q' + i + '-9'; }));
 
         //initialise the tooltip
         var tooltip = d3.tip()
@@ -564,19 +611,19 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
           .append('svg')
           .attr('width', width)
           .attr('height', height);
-        
+
         //invoke tooltip for this context
         svg.call(tooltip);
 
         var projection = d3.geo.mercator()
-          .center([".$countrycenter[0].",".$countrycenter[1]."])
-          .scale(".$countrysize.")
+          .center([".$mapcenter[0].",".$mapcenter[1]."])
+          .scale(".$mapsize.")
           .translate([width/2, height/2]);
 
         var path = d3.geo.path()
           .projection(projection);
 
-        d3.json('".$uploadfile."', function (error, topology) {
+        d3.json('".$mapfile."', function (error, topology) {
           if (error) return console.error(error);
           var subunits = topojson.feature(topology, topology.objects.subunits);
 
@@ -608,31 +655,35 @@ public function colchart($name='chart',$data,$options_array=null,$custom_color=n
 
     legend.append('rect')
       .attr('x', 20)
-      .attr('y', function(d, i){ 
+      .attr('y', function(d, i){
         return height - (i*ls_h) - 2*ls_h;
       })
       .attr('width', ls_w)
       .attr('height', ls_h)
       .style('stroke', 'black')
       .style('stroke-width', 1)
-      .attr('class', function(d) { 
+      .attr('class', function(d) {
         var extent = quantize.invertExtent(d);
-        return quantize(extent[0]); 
+        return quantize(extent[0]);
       });
 
     legend.append('text')
       .attr('x', 50)
-      .attr('y', function(d, i){ 
+      .attr('y', function(d, i){
         return height - (i*ls_h) - ls_h - 4;
       })
-      .text(function(d){ 
+      .text(function(d){
         var extent = quantize.invertExtent(d);
-        var format = d3.format('0.2f');
+        if (rangetop < 9) {
+          var format = d3.format('0.2f');
+        }
+        else {
+          var format = d3.format('d');
+        }
         return format(+extent[0]);
       });
 
-    </script>
-    ";
+    </script>";
 
      return $html;
   }

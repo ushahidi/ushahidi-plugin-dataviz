@@ -18,7 +18,7 @@ class geojson {
     /*
      * The get_geometries function creates a list of choropleth options from a geojson file
      */
-    public function get_geometries($gisfilename) {
+    public function get_geometry($gisfilename) {
 
         $full_gisfilename = Kohana::config('upload.directory').'/'.$gisfilename;
         $filetext = file_get_contents($full_gisfilename);
@@ -33,6 +33,18 @@ class geojson {
             }
         }
         $optstring = implode(',',$options);
-        return $optstring;
+
+        $bbox = $filejson->bbox;
+        $xpos = ($bbox[0] + $bbox[2])/2.0;
+        $ypos = ($bbox[1] + $bbox[3])/2.0;
+        $width = ($bbox[2] - $bbox[0]);
+
+        $geometry = array();
+        $geometry['options'] = $optstring;
+        $geometry['xpos'] = $xpos;
+        $geometry['ypos'] = $ypos;
+        $geometry['width'] = $width;
+
+        return $geometry;
     }
 }
