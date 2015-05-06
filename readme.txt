@@ -16,7 +16,7 @@ Uses D3.js to add visualizations to Ushahidi.
 == Installation ==
 
 1. Copy the entire ushahidi-plugin-dataviz directory into your /plugins/ directory.
-2. Copy the files d3.js and topojson.v1.min.js into the directory media/js.
+2. Copy the files d3.js, topojson.v1.min.js, d3-tip.js and saveSvgAsPng.js into the directory media/js.
 3. Activate the plugin.
 4. If you want to use choropleth visualizations, you’ll need a topojson file containing the boundaries of the regions in the choropleth.  Topojson files for admin level 1 (regions) for most countries in the world are in the zipfile countries.zip; the 3-letter codes at the start of each file is the ISO3166 Alpha3 codes for that country. (Techs: these files have been generated with GDAL from the NaturalEarth.com admin1 dataset).
 4a. Load the topojson by:
